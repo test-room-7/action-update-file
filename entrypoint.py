@@ -6,7 +6,8 @@ import sys
 
 import github3
 
-encoding='utf-8'
+ENCODING = 'utf-8'
+
 
 def get_input(key):
     input_key = f'INPUT_{key.upper()}'
@@ -14,17 +15,17 @@ def get_input(key):
     if input_key in os.environ:
         return os.environ[input_key]
 
-    raise Exception(f'Error: No input: {key}')
+    raise ValueError(f'Error: No input: {key}')
 
 
 def get_variable(var):
     if var in os.environ:
         return os.environ[var]
 
-    raise Exception(f'Error: No variable: {var}')
+    raise ValueError(f'Error: No variable: {var}')
 
 
-def main(args):
+def main():
     try:
         token = get_input('github-token')
         branch = get_input('branch')
@@ -32,8 +33,8 @@ def main(args):
         commit_msg = get_input('commit-msg')
 
         repo = get_variable('GITHUB_REPOSITORY')
-    except Exception as e:
-        print(e)
+    except ValueError as err:
+        print(err)
         return 1
 
     try:
@@ -43,15 +44,15 @@ def main(args):
         print("Error: Unable to authenticate")
         return 1
 
-    with codecs.open(file_path, mode='r', encoding=encoding) as f:
-        local_contents = f.read()
+    with codecs.open(file_path, mode='r', encoding=ENCODING) as fp:
+        local_contents = fp.read()
 
     remote_file = repository.file_contents(file_path, ref=branch)
-    remote_contents = remote_file.decoded.decode(encoding)
+    remote_contents = remote_file.decoded.decode(ENCODING)
 
     if local_contents != remote_contents:
         pushed_change = remote_file.update(
-            commit_msg, local_contents.encode(encoding), branch=branch)
+            commit_msg, local_contents.encode(ENCODING), branch=branch)
 
         commit_sha = pushed_change['commit'].sha
         print("Pushed {0} to {1}".format(commit_sha, branch))
@@ -62,4 +63,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+    sys.exit(main())
