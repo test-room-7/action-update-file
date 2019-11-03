@@ -1,0 +1,25 @@
+name: Update file on GitHub
+description: Update (i.e. commit and push) a given file
+author: alexesprit
+inputs:
+  # Required
+  commit-msg:
+    description: Commit message
+    requried: true
+
+  file-path:
+    description: Path to file to update
+    requried: true
+
+  github-token:
+    description: GitHub token
+    requried: true
+
+  # Optional
+  branch:
+    description: Branch name
+    default: master
+    requried: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
