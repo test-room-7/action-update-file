@@ -1,4 +1,4 @@
-FROM python:3.7-buster
+FROM python:slim-buster
 
 LABEL version="0.1.1"
 LABEL repository="https://github.com/alexesprit/action-update-file"
