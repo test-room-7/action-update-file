@@ -20,6 +20,11 @@ inputs:
     description: Branch name
     default: master
     requried: false
+
+  allow-removing:
+    desciption: Allow to remove file
+    default: false
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
