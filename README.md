@@ -24,6 +24,23 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+## Inputs
+
+### Required inputs
+
+- `commit-msg`: a text used as a commit message
+- `file-path`: a path to file to be updated
+- `github-token`: GitHub token
+
+### Optional inputs
+
+- `branch`: branch to push changes (`master` by default)
+- `allow-removing`: allow to remove file if local copy is missing
+  (`false` by default)
+
+Note that the action will produce an error iflocal copy is missing,
+and the `allow-removing` flag is `false`.
+
 ## License
 
 See the [license file][License].
