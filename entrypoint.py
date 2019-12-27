@@ -9,6 +9,7 @@ import github3
 from github3.exceptions import NotFoundError, AuthenticationFailed
 
 ENCODING = 'utf-8'
+SHORT_SHA_LEN = 7
 
 
 def get_input(key):
@@ -93,7 +94,7 @@ def main():
             print(f'Removed {file_path}')
 
     if pushed_change:
-        commit_sha = pushed_change['commit'].sha
+        commit_sha = pushed_change['commit'][:SHORT_SHA_LEN]
         print(f'Pushed {commit_sha} to {branch}')
     else:
         print('No changes to push')
