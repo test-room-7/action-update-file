@@ -1,11 +1,12 @@
-## action-update-file
+# action-update-file
 
 Update (i.e. commit and push) a given file on GitHub.
 
 ## Usage
 
-The action requires GitHub token; no username or e-mail are required.
+The action requires GitHub token for authentication; no username or e-mail are required.
 
+Here is an example of a workflow using `action-update-file`: 
 ```yml
 name: Resources
 on: repository_dispatch
@@ -16,13 +17,17 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
+    - name: Fetch resources
+      run ./scripts/fetch-resources.sh
     - name: Update resources
-      uses: alexesprit/action-update-file@v0.1.0
+      uses: alexesprit/action-update-file@master
       with:
         file-path: path/to/file
         commit-msg: Update resources
         github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+Note that this action does not change files. They should be changed with scripts and/or other actions.
 
 ## Inputs
 
