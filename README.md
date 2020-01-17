@@ -43,8 +43,7 @@ Note that this action does not change files. They should be changed with scripts
 - `allow-removing`: allow to remove file if local copy is missing
   (`false` by default)
 
-Note that the action will produce an error iflocal copy is missing,
-and the `allow-removing` flag is `false`.
+Note that the action will produce an error if a local copy of a given file is missing, and the `allow-removing` flag is `false`.
 
 ## License
 
