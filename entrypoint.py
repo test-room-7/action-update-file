@@ -94,7 +94,7 @@ def main():
             print(f'Removed {file_path}')
 
     if pushed_change:
-        commit_sha = pushed_change['commit'][:SHORT_SHA_LEN]
+        commit_sha = pushed_change['commit'].sha[:SHORT_SHA_LEN]
         print(f'Pushed {commit_sha} to {branch}')
     else:
         print('No changes to push')
