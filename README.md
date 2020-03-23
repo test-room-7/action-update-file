@@ -1,4 +1,4 @@
-# action-update-file
+# action-update-file ![Version][GitHubBadge] ![Test status][WorkflowBadge]
 
 Update (i.e. commit and push) a given file on GitHub.
 
@@ -6,7 +6,7 @@ Update (i.e. commit and push) a given file on GitHub.
 
 The action requires GitHub token for authentication; no username or e-mail are required.
 
-Here is an example of a workflow using `action-update-file`: 
+Here is an example of a workflow using `action-update-file`:
 ```yml
 name: Resources
 on: repository_dispatch
@@ -50,3 +50,5 @@ Note that the action will produce an error if a local copy of a given file is mi
 See the [license file][License].
 
 [License]: https://github.com/alexesprit/action-update-file/blob/master/LICENSE.md
+[WorkflowBadge]: https://img.shields.io/github/workflow/status/alexesprit/action-update-file/Test?label=Test
+[GitHubBadge]: https://img.shields.io/github/v/release/alexesprit/action-update-file
