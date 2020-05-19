@@ -3,7 +3,7 @@
   "version": "0.2.3",
   "private": true,
   "author": "Alexey <alex.esprit@gmail.com>",
-  "description": "Update (i.e. commit and push) a given file on GitHub",
+  "description": "Update (i.e. commit and push) files on GitHub",
   "license": "MIT",
   "main": "lib/main.js",
   "repository": {

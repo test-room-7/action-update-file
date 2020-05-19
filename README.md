@@ -1,6 +1,6 @@
 # action-update-file ![Version][VersionBadge] ![Lint status][WorkflowBadge]
 
-Update (i.e. commit and push) a given file on GitHub.
+Update (i.e. commit and push) files on GitHub.
 
 ## Usage
 
