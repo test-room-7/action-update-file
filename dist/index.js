@@ -2024,7 +2024,8 @@ function main() {
             console.log('No files to update');
             return;
         }
-        console.log(`Pushed ${commitSha} to ${options.branch}`);
+        const shortSha = commitSha.slice(0, 7);
+        console.log(`Pushed ${shortSha} to ${options.branch}`);
     }).catch((err) => {
         core_1.setFailed(err.message);
     });
