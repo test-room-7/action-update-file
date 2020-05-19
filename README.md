@@ -20,7 +20,7 @@ jobs:
     - name: Fetch resources
       run: ./scripts/fetch-resources.sh
     - name: Update resources
-      uses: alexesprit/action-update-file@v1
+      uses: test-room-7/action-update-file@v1
       with:
         file-path: path/to/file
         commit-msg: Update resources
@@ -43,7 +43,7 @@ jobs:
     - name: Fetch resources
       run: ./scripts/fetch-resources.sh
     - name: Update resources
-      uses: alexesprit/action-update-file@v1
+      uses: test-room-7/action-update-file@v1
       with:
         file-path: |
             path/to/file1
@@ -73,6 +73,6 @@ Note that the action will produce an error if a local copy of a given file is mi
 
 See the [license file][License].
 
-[License]: https://github.com/alexesprit/action-update-file/blob/master/LICENSE.md
-[VersionBadge]: https://img.shields.io/github/v/release/alexesprit/action-update-file
-[WorkflowBadge]: https://img.shields.io/github/workflow/status/alexesprit/action-update-file/Lint?label=lint
+[License]: https://github.com/test-room-7/action-update-file/blob/master/LICENSE.md
+[VersionBadge]: https://img.shields.io/github/v/release/test-room-7/action-update-file
+[WorkflowBadge]: https://img.shields.io/github/workflow/status/test-room-7/action-update-file/Lint?label=lint
