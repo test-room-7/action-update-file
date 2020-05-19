@@ -1,0 +1,20 @@
+name: Update version reference
+on:
+  release:
+    types: [published]
+jobs:
+  update-ref:
+    name: Update reference
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract major version from tag
+        run: |
+          FULL_VERSION=${GITHUB_REF##*/}
+          MAJOR_VERSION=$(echo "${FULL_VERSION%.*.*}")
+          echo "::set-env name=TAG_NAME::${MAJOR_VERSION}"
+      - name: Update reference to major version
+        uses: richardsimko/update-tag@master
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

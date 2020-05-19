@@ -26,8 +26,8 @@ inputs:
     default: false
     required: false
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: 'node12'
+  main: 'dist/index.js'
 branding:
   icon: git-commit
   color: gray-dark

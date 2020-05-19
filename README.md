@@ -1,4 +1,4 @@
-# action-update-file ![Version][GitHubBadge] ![Test status][WorkflowBadge]
+# action-update-file ![Version][VersionBadge] ![Lint status][WorkflowBadge]
 
 Update (i.e. commit and push) a given file on GitHub.
 
@@ -50,5 +50,5 @@ Note that the action will produce an error if a local copy of a given file is mi
 See the [license file][License].
 
 [License]: https://github.com/alexesprit/action-update-file/blob/master/LICENSE.md
-[WorkflowBadge]: https://img.shields.io/github/workflow/status/alexesprit/action-update-file/Test?label=Test
-[GitHubBadge]: https://img.shields.io/github/v/release/alexesprit/action-update-file
+[VersionBadge]: https://img.shields.io/github/v/release/alexesprit/action-update-file
+[WorkflowBadge]: https://img.shields.io/github/workflow/status/alexesprit/action-update-file/Lint?label=lint

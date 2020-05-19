@@ -1,0 +1,35 @@
+{
+  "name": "action-update-file",
+  "version": "0.2.3",
+  "private": true,
+  "author": "Alexey <alex.esprit@gmail.com>",
+  "description": "Update (i.e. commit and push) a given file on GitHub",
+  "license": "MIT",
+  "main": "lib/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexesprit/action-update-file.git"
+  },
+  "keywords": [
+    "actions",
+    "github"
+  ],
+  "dependencies": {
+    "@actions/core": "1.2.4",
+    "@actions/github": "2.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "14.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
+    "@zeit/ncc": "0.22.1",
+    "eslint": "7.0.0",
+    "eslint-config-web-scrobbler": "^0.2.0",
+    "typescript": "3.9.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dist": "tsc && ncc build",
+    "lint": "eslint --ext .ts src"
+  }
+}
