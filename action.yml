@@ -1,5 +1,5 @@
 name: Update file on GitHub
-description: Update (i.e. commit and push) a files on GitHub
+description: Update (i.e. commit and push) files on GitHub
 author: alexesprit
 inputs:
   # Required
