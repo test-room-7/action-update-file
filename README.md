@@ -20,7 +20,7 @@ jobs:
     - name: Fetch resources
       run: ./scripts/fetch-resources.sh
     - name: Update resources
-      uses: alexesprit/action-update-file@master
+      uses: alexesprit/action-update-file@v1
       with:
         file-path: path/to/file
         commit-msg: Update resources
@@ -28,6 +28,30 @@ jobs:
 ```
 
 Note that this action does not change files. They should be changed with scripts and/or other actions.
+
+You can also update multiple files:
+```yml
+name: Resources
+on: repository_dispatch
+jobs:
+  resources:
+    name: Update resources
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+    - name: Fetch resources
+      run: ./scripts/fetch-resources.sh
+    - name: Update resources
+      uses: alexesprit/action-update-file@v1
+      with:
+        file-path: |
+            path/to/file1
+            path/to/file2
+            path/to/file3
+        commit-msg: Update resources
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+```
 
 ## Inputs
 
