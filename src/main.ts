@@ -28,7 +28,8 @@ function main(): void {
             return;
         }
 
-        console.log(`Pushed ${commitSha} to ${options.branch}`);
+        const shortSha = commitSha.slice(0, 7);
+        console.log(`Pushed ${shortSha} to ${options.branch}`);
     }).catch((err) => {
         setFailed(err.message);
     });
