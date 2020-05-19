@@ -4264,7 +4264,8 @@ class Updater {
                 const { data } = yield this.octokit.repos.getContents({
                     owner: this.owner,
                     repo: this.repo,
-                    path: filePath
+                    path: filePath,
+                    ref: this.branch,
                 });
                 content = Buffer.from(data['content'], 'base64').toString();
                 sha = data['sha'];
