@@ -1,4 +1,4 @@
-# action-update-file ![Version][VersionBadge] ![Lint status][WorkflowBadge]
+# action-update-file [![Version][VersionBadge]][VersionUrl] [![Lint status][WorkflowBadge]][WorkflowUrl]
 
 Update (i.e. commit and push) files on GitHub.
 
@@ -75,4 +75,6 @@ See the [license file][License].
 
 [License]: https://github.com/test-room-7/action-update-file/blob/master/LICENSE.md
 [VersionBadge]: https://img.shields.io/github/v/release/test-room-7/action-update-file
+[VersionUrl]: https://github.com/marketplace/actions/update-file-on-github
 [WorkflowBadge]: https://img.shields.io/github/workflow/status/test-room-7/action-update-file/Lint?label=lint
+[WorkflowUrl]: https://github.com/test-room-7/action-update-file/actions
