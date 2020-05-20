@@ -1,4 +1,4 @@
-name: Update file on GitHub
+name: Update files on GitHub
 description: Update (i.e. commit and push) files on GitHub
 author: alexesprit
 inputs:
