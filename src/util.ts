@@ -2,7 +2,6 @@ import { getInput, InputOptions } from '@actions/core';
 
 export type UpdaterOptions = {
     branch: string;
-    repository: string;
     token: string;
     message: string;
 };
@@ -29,7 +28,6 @@ export function getActionOptions(): UpdaterOptions {
     const token = getInput('github-token', { required: true });
     const message = getInput('commit-msg', { required: true });
     const branch = getInput('branch');
-    const repository = process.env.GITHUB_REPOSITORY;
 
-    return { token, repository, message, branch };
+    return { token, message, branch };
 }

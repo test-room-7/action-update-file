@@ -1,7 +1,7 @@
 import { readFile, existsSync } from 'fs';
 import { promisify } from 'util';
 
-import { GitHub } from '@actions/github';
+import { GitHub, context } from '@actions/github';
 import { UpdaterOptions } from './util';
 
 const readFileAsync = promisify(readFile);
@@ -27,17 +27,11 @@ export class Updater {
     octokit: GitHub;
     message: string;
     branch: string;
-    owner: string;
-    repo: string;
 
     constructor(options: UpdaterOptions) {
-        const [owner, repo] = options.repository.split('/', 2);
-
         this.octokit = new GitHub(options.token);
         this.message = options.message;
         this.branch = options.branch;
-        this.owner = owner;
-        this.repo = repo;
     }
 
     /** Public methods. */
@@ -60,11 +54,10 @@ export class Updater {
     /** Private methods. */
 
     async createCommit(tree: string, parent: string): Promise<string> {
-        const { owner, repo, message } = this;
+        const { message } = this;
 
         const { data } = await this.octokit.git.createCommit({
-            owner,
-            repo,
+            ...context.repo,
             message,
             tree,
             parents: [parent],
@@ -74,8 +67,6 @@ export class Updater {
     }
 
     async createTree(paths: string[], base_tree: string): Promise<string> {
-        const { owner, repo } = this;
-
         const promises = Promise.all(paths.map((path) => {
             return this.createTreeItem(path);
         }));
@@ -89,7 +80,7 @@ export class Updater {
         }
 
         const { data } = await this.octokit.git.createTree({
-            owner, repo, tree, base_tree,
+            ...context.repo, tree, base_tree,
         });
 
         return data.sha;
@@ -117,10 +108,8 @@ export class Updater {
     }
 
     async getLastRef(): Promise<RefInfo> {
-        const { owner, repo } = this;
-
         const { data } = await this.octokit.repos.listCommits({
-            owner, repo, per_page: 1, sha: this.branch
+            ...context.repo, per_page: 1, sha: this.branch
         });
 
         const commitSha = data[0].sha;
@@ -143,8 +132,7 @@ export class Updater {
 
         try {
             const { data } = await this.octokit.repos.getContents({
-                owner: this.owner,
-                repo: this.repo,
+                ...context.repo,
                 path: filePath,
                 ref: this.branch,
             });
@@ -159,11 +147,10 @@ export class Updater {
     }
 
     async updateRef(sha: string): Promise<string> {
-        const { owner, repo } = this;
         const ref = `heads/${this.branch}`;
 
         const { data } = await this.octokit.git.updateRef({
-            owner, repo, ref, sha
+            ...context.repo, ref, sha
         });
 
         return data.object.sha;
