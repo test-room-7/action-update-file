@@ -4165,12 +4165,9 @@ const github_1 = __webpack_require__(469);
 const readFileAsync = util_1.promisify(fs_1.readFile);
 class Updater {
     constructor(options) {
-        const [owner, repo] = options.repository.split('/', 2);
         this.octokit = new github_1.GitHub(options.token);
         this.message = options.message;
         this.branch = options.branch;
-        this.owner = owner;
-        this.repo = repo;
     }
     /** Public methods. */
     updateFiles(paths) {
@@ -4189,20 +4186,14 @@ class Updater {
     /** Private methods. */
     createCommit(tree, parent) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { owner, repo, message } = this;
-            const { data } = yield this.octokit.git.createCommit({
-                owner,
-                repo,
-                message,
-                tree,
-                parents: [parent],
-            });
+            const { message } = this;
+            const { data } = yield this.octokit.git.createCommit(Object.assign(Object.assign({}, github_1.context.repo), { message,
+                tree, parents: [parent] }));
             return data.sha;
         });
     }
     createTree(paths, base_tree) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { owner, repo } = this;
             const promises = Promise.all(paths.map((path) => {
                 return this.createTreeItem(path);
             }));
@@ -4212,9 +4203,7 @@ class Updater {
             if (tree.length === 0) {
                 return null;
             }
-            const { data } = yield this.octokit.git.createTree({
-                owner, repo, tree, base_tree,
-            });
+            const { data } = yield this.octokit.git.createTree(Object.assign(Object.assign({}, github_1.context.repo), { tree, base_tree }));
             return data.sha;
         });
     }
@@ -4240,10 +4229,7 @@ class Updater {
     }
     getLastRef() {
         return __awaiter(this, void 0, void 0, function* () {
-            const { owner, repo } = this;
-            const { data } = yield this.octokit.repos.listCommits({
-                owner, repo, per_page: 1, sha: this.branch
-            });
+            const { data } = yield this.octokit.repos.listCommits(Object.assign(Object.assign({}, github_1.context.repo), { per_page: 1, sha: this.branch }));
             const commitSha = data[0].sha;
             const treeSha = data[0].commit.tree.sha;
             return { treeSha, commitSha };
@@ -4262,12 +4248,7 @@ class Updater {
             let content = null;
             let sha = null;
             try {
-                const { data } = yield this.octokit.repos.getContents({
-                    owner: this.owner,
-                    repo: this.repo,
-                    path: filePath,
-                    ref: this.branch,
-                });
+                const { data } = yield this.octokit.repos.getContents(Object.assign(Object.assign({}, github_1.context.repo), { path: filePath, ref: this.branch }));
                 content = Buffer.from(data['content'], 'base64').toString();
                 sha = data['sha'];
             }
@@ -4279,11 +4260,8 @@ class Updater {
     }
     updateRef(sha) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { owner, repo } = this;
             const ref = `heads/${this.branch}`;
-            const { data } = yield this.octokit.git.updateRef({
-                owner, repo, ref, sha
-            });
+            const { data } = yield this.octokit.git.updateRef(Object.assign(Object.assign({}, github_1.context.repo), { ref, sha }));
             return data.object.sha;
         });
     }
@@ -4366,8 +4344,7 @@ function getActionOptions() {
     const token = core_1.getInput('github-token', { required: true });
     const message = core_1.getInput('commit-msg', { required: true });
     const branch = core_1.getInput('branch');
-    const repository = process.env.GITHUB_REPOSITORY;
-    return { token, repository, message, branch };
+    return { token, message, branch };
 }
 exports.getActionOptions = getActionOptions;
 
