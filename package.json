@@ -1,6 +1,6 @@
 {
   "name": "action-update-file",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "author": "Alexey <alex.esprit@gmail.com>",
   "description": "Update (i.e. commit and push) files on GitHub",
