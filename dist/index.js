@@ -2021,11 +2021,12 @@ function main() {
     const updater = new update_1.Updater(options);
     updater.updateFiles(pathsToUpdate).then((commitSha) => {
         if (commitSha === null) {
-            console.log('No files to update');
+            core_1.info('No files to update');
             return;
         }
+        core_1.setOutput('commit-sha', commitSha);
         const shortSha = commitSha.slice(0, 7);
-        console.log(`Pushed ${shortSha} to ${options.branch}`);
+        core_1.info(`Pushed ${shortSha} to ${options.branch}`);
     }).catch((err) => {
         core_1.setFailed(err.message);
     });
