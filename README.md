@@ -67,11 +67,11 @@ jobs:
 - `allow-removing`: allow to remove file if local copy is missing
   (`false` by default)
 
+Note that the action will produce an error if a local copy of a given file is missing, and the `allow-removing` flag is `false`.
+
 ## Outputs
 
 - `commit-sha`: the hash of the commit created by this action
-
-Note that the action will produce an error if a local copy of a given file is missing, and the `allow-removing` flag is `false`.
 
 ## License
 
