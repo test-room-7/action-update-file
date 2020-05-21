@@ -1,6 +1,6 @@
 import { existsSync } from 'fs';
 
-import { setFailed, setOutput } from '@actions/core';
+import { setFailed, setOutput, info } from '@actions/core';
 
 import {
     getActionOptions, getBooleanInput, getPathsToUpdate
@@ -24,14 +24,14 @@ function main(): void {
     const updater = new Updater(options);
     updater.updateFiles(pathsToUpdate).then((commitSha) => {
         if (commitSha === null) {
-            console.log('No files to update');
+            info('No files to update');
             return;
         }
 
         setOutput('commit-sha', commitSha);
 
         const shortSha = commitSha.slice(0, 7);
-        console.log(`Pushed ${shortSha} to ${options.branch}`);
+        info(`Pushed ${shortSha} to ${options.branch}`);
     }).catch((err) => {
         setFailed(err.message);
     });
