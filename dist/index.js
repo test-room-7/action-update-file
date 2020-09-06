@@ -2,7 +2,7 @@ module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 109:
+/***/ 538:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -10,8 +10,8 @@ module.exports =
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __webpack_require__(747);
 const core_1 = __webpack_require__(186);
-const util_1 = __webpack_require__(24);
-const update_1 = __webpack_require__(56);
+const util_1 = __webpack_require__(731);
+const update_1 = __webpack_require__(206);
 function main() {
     const options = util_1.getActionOptions();
     const pathsToUpdate = util_1.getPathsToUpdate();
@@ -44,21 +44,12 @@ main();
 
 /***/ }),
 
-/***/ 56:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ 206:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 /* eslint-disable camelcase */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Updater = void 0;
 const fs_1 = __webpack_require__(747);
@@ -71,114 +62,96 @@ class Updater {
         this.message = options.message;
         this.defaultBranch = options.branch || null;
     }
-    updateFiles(paths) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const branch = yield this.getBranch();
-            const lastRef = yield this.getLastRef(branch);
-            const baseTreeSha = lastRef.treeSha;
-            const baseCommitSha = lastRef.commitSha;
-            const newTreeSha = yield this.createTree(branch, paths, baseTreeSha);
-            if (newTreeSha === null) {
-                return null;
-            }
-            const newCommitSha = yield this.createCommit(newTreeSha, baseCommitSha);
-            return this.updateRef(newCommitSha, branch);
-        });
-    }
-    createCommit(tree, parent) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { message } = this;
-            const { data } = yield this.octokit.git.createCommit(Object.assign(Object.assign({}, github_1.context.repo), { message,
-                tree, parents: [parent] }));
-            return data.sha;
-        });
-    }
-    createTree(branch, filePaths, base_tree) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const promises = Promise.all(filePaths.map((filePath) => {
-                return this.createTreeItem(filePath, branch);
-            }));
-            const tree = (yield promises).filter((change) => {
-                return change !== null;
-            });
-            if (tree.length === 0) {
-                return null;
-            }
-            const { data } = yield this.octokit.git.createTree(Object.assign(Object.assign({}, github_1.context.repo), { tree,
-                base_tree }));
-            return data.sha;
-        });
-    }
-    createTreeItem(filePath, branch) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const remoteFile = yield this.getRemoteContents(filePath, branch);
-            const localContents = yield this.getLocalContents(filePath);
-            const remoteContents = remoteFile.content;
-            const mode = '100644';
-            if (localContents !== null) {
-                if (localContents !== remoteContents) {
-                    const content = localContents;
-                    return { mode, path: filePath, content };
-                }
-            }
-            else if (remoteContents !== null) {
-                return {
-                    mode,
-                    path: filePath,
-                    sha: null,
-                };
-            }
+    async updateFiles(paths) {
+        const branch = await this.getBranch();
+        const lastRef = await this.getLastRef(branch);
+        const baseTreeSha = lastRef.treeSha;
+        const baseCommitSha = lastRef.commitSha;
+        const newTreeSha = await this.createTree(branch, paths, baseTreeSha);
+        if (newTreeSha === null) {
             return null;
-        });
+        }
+        const newCommitSha = await this.createCommit(newTreeSha, baseCommitSha);
+        return this.updateRef(newCommitSha, branch);
     }
-    getBranch() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.defaultBranch !== null) {
-                return Promise.resolve(this.defaultBranch);
-            }
-            const { data } = yield this.octokit.repos.get(github_1.context.repo);
-            return data.default_branch;
-        });
+    async createCommit(tree, parent) {
+        const { message } = this;
+        const { data } = await this.octokit.git.createCommit(Object.assign(Object.assign({}, github_1.context.repo), { message,
+            tree, parents: [parent] }));
+        return data.sha;
     }
-    getLastRef(branch) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { data } = yield this.octokit.repos.listCommits(Object.assign(Object.assign({}, github_1.context.repo), { per_page: 1, sha: branch }));
-            const commitSha = data[0].sha;
-            const treeSha = data[0].commit.tree.sha;
-            return { treeSha, commitSha };
+    async createTree(branch, filePaths, base_tree) {
+        const promises = Promise.all(filePaths.map((filePath) => {
+            return this.createTreeItem(filePath, branch);
+        }));
+        const tree = (await promises).filter((change) => {
+            return change !== null;
         });
-    }
-    getLocalContents(filePath) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (fs_1.existsSync(filePath)) {
-                return (yield readFileAsync(filePath)).toString();
-            }
+        if (tree.length === 0) {
             return null;
-        });
+        }
+        const { data } = await this.octokit.git.createTree(Object.assign(Object.assign({}, github_1.context.repo), { tree,
+            base_tree }));
+        return data.sha;
     }
-    getRemoteContents(filePath, branch) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let content = null;
-            let sha = null;
-            try {
-                const { data } = yield this.octokit.repos.getContent(Object.assign(Object.assign({}, github_1.context.repo), { path: filePath, ref: branch }));
-                content = Buffer.from(data['content'], 'base64').toString();
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                sha = data['sha'];
+    async createTreeItem(filePath, branch) {
+        const remoteFile = await this.getRemoteContents(filePath, branch);
+        const localContents = await this.getLocalContents(filePath);
+        const remoteContents = remoteFile.content;
+        const mode = '100644';
+        if (localContents !== null) {
+            if (localContents !== remoteContents) {
+                const content = localContents;
+                return { mode, path: filePath, content };
             }
-            catch (err) {
-                // Do nothing
-            }
-            return { content, sha };
-        });
+        }
+        else if (remoteContents !== null) {
+            return {
+                mode,
+                path: filePath,
+                sha: null,
+            };
+        }
+        return null;
     }
-    updateRef(sha, branch) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ref = `heads/${branch}`;
-            const { data } = yield this.octokit.git.updateRef(Object.assign(Object.assign({}, github_1.context.repo), { ref,
-                sha }));
-            return data.object.sha;
-        });
+    async getBranch() {
+        if (this.defaultBranch !== null) {
+            return Promise.resolve(this.defaultBranch);
+        }
+        const { data } = await this.octokit.repos.get(github_1.context.repo);
+        return data.default_branch;
+    }
+    async getLastRef(branch) {
+        const { data } = await this.octokit.repos.listCommits(Object.assign(Object.assign({}, github_1.context.repo), { per_page: 1, sha: branch }));
+        const commitSha = data[0].sha;
+        const treeSha = data[0].commit.tree.sha;
+        return { treeSha, commitSha };
+    }
+    async getLocalContents(filePath) {
+        if (fs_1.existsSync(filePath)) {
+            return (await readFileAsync(filePath)).toString();
+        }
+        return null;
+    }
+    async getRemoteContents(filePath, branch) {
+        let content = null;
+        let sha = null;
+        try {
+            const { data } = await this.octokit.repos.getContent(Object.assign(Object.assign({}, github_1.context.repo), { path: filePath, ref: branch }));
+            content = Buffer.from(data['content'], 'base64').toString();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            sha = data['sha'];
+        }
+        catch (err) {
+            // Do nothing
+        }
+        return { content, sha };
+    }
+    async updateRef(sha, branch) {
+        const ref = `heads/${branch}`;
+        const { data } = await this.octokit.git.updateRef(Object.assign(Object.assign({}, github_1.context.repo), { ref,
+            sha }));
+        return data.object.sha;
     }
 }
 exports.Updater = Updater;
@@ -186,7 +159,7 @@ exports.Updater = Updater;
 
 /***/ }),
 
-/***/ 24:
+/***/ 731:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -6058,6 +6031,6 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(109);
+/******/ 	return __webpack_require__(538);
 /******/ })()
 ;
