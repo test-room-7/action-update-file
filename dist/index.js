@@ -26,11 +26,12 @@ function main() {
     const updater = new update_1.Updater(options);
     updater
         .updateFiles(pathsToUpdate)
-        .then(({ commitSha, branch }) => {
-        if (commitSha === null) {
+        .then((updateResult) => {
+        if (updateResult === null) {
             core_1.info('No files to update');
             return;
         }
+        const { commitSha, branch } = updateResult;
         core_1.setOutput('commit-sha', commitSha);
         const shortSha = commitSha.slice(0, 7);
         core_1.info(`Pushed ${shortSha} to ${branch}`);
@@ -55,6 +56,7 @@ exports.Updater = void 0;
 const fs_1 = __webpack_require__(747);
 const util_1 = __webpack_require__(669);
 const github_1 = __webpack_require__(438);
+const util_2 = __webpack_require__(731);
 const readFileAsync = util_1.promisify(fs_1.readFile);
 class Updater {
     constructor(options) {
@@ -82,12 +84,9 @@ class Updater {
         return data.sha;
     }
     async createTree(branch, filePaths, base_tree) {
-        const promises = Promise.all(filePaths.map((filePath) => {
+        const tree = (await Promise.all(filePaths.map((filePath) => {
             return this.createTreeItem(filePath, branch);
-        }));
-        const tree = (await promises).filter((change) => {
-            return change !== null;
-        });
+        }))).filter(util_2.isNotNull);
         if (tree.length === 0) {
             return null;
         }
@@ -98,7 +97,7 @@ class Updater {
     async createTreeItem(filePath, branch) {
         const remoteFile = await this.getRemoteContents(filePath, branch);
         const localContents = await this.getLocalContents(filePath);
-        const remoteContents = remoteFile.content;
+        const remoteContents = (remoteFile === null || remoteFile === void 0 ? void 0 : remoteFile.content) || null;
         const mode = '100644';
         if (localContents !== null) {
             if (localContents !== remoteContents) {
@@ -110,7 +109,6 @@ class Updater {
             return {
                 mode,
                 path: filePath,
-                sha: null,
             };
         }
         return null;
@@ -135,18 +133,17 @@ class Updater {
         return null;
     }
     async getRemoteContents(filePath, branch) {
-        let content = null;
-        let sha = null;
         try {
             const { data } = await this.octokit.repos.getContent(Object.assign(Object.assign({}, github_1.context.repo), { path: filePath, ref: branch }));
-            content = Buffer.from(data['content'], 'base64').toString();
+            const content = Buffer.from(data['content'], 'base64').toString();
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            sha = data['sha'];
+            const sha = data['sha'];
+            return { content, sha };
         }
         catch (err) {
             // Do nothing
         }
-        return { content, sha };
+        return null;
     }
     async updateRef(sha, branch) {
         const ref = `heads/${branch}`;
@@ -166,7 +163,7 @@ exports.Updater = Updater;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getActionOptions = exports.getPathsToUpdate = exports.getBooleanInput = void 0;
+exports.isNotNull = exports.getActionOptions = exports.getPathsToUpdate = exports.getBooleanInput = void 0;
 const core_1 = __webpack_require__(186);
 function getBooleanInput(name, options) {
     const value = core_1.getInput(name, options).toLowerCase();
@@ -191,6 +188,10 @@ function getActionOptions() {
     return { token, message, branch };
 }
 exports.getActionOptions = getActionOptions;
+function isNotNull(arg) {
+    return arg !== null;
+}
+exports.isNotNull = isNotNull;
 
 
 /***/ }),
