@@ -55,15 +55,15 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Inputs
+### Inputs
 
-### Required inputs
+#### Required inputs
 
 -   `commit-msg`: a text used as a commit message
 -   `file-path`: a path to file to be updated
 -   `github-token`: GitHub token
 
-### Optional inputs
+#### Optional inputs
 
 -   `branch`: branch to push changes (`master` by default)
 -   `allow-removing`: allow to remove file if local copy is missing
@@ -71,9 +71,24 @@ jobs:
 
 Note that the action will produce an error if a local copy of a given file is missing, and the `allow-removing` flag is `false`.
 
-## Outputs
+### Outputs
 
 -   `commit-sha`: the hash of the commit created by this action
+
+## Development
+
+```sh
+# Install dependencies
+> npm install
+
+# Build the action
+> npm run dist
+
+# Lint project files
+> npm run lint
+```
+
+Don't push dist files; they're updated automatically by the action itself.
 
 ## License
 
