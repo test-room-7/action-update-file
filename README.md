@@ -65,7 +65,7 @@ jobs:
 
 #### Optional inputs
 
--   `branch`: branch to push changes (`master` by default)
+-   `branch`: branch to push changes (the default branch is used if no `branch` is specified)
 -   `allow-removing`: allow to remove file if local copy is missing
     (`false` by default)
 

@@ -4,7 +4,6 @@ import { readFile, existsSync } from 'fs';
 import { promisify } from 'util';
 
 import { getOctokit, context } from '@actions/github';
-import { GitHub } from '@actions/github/lib/utils';
 
 import { UpdaterOptions } from './util';
 
@@ -30,27 +29,29 @@ interface TreeItem {
 export class Updater {
 	private octokit: ReturnType<typeof getOctokit>;
 	private message: string;
-	private branch: string;
+	private defaultBranch: string;
 
 	constructor(options: UpdaterOptions) {
 		this.octokit = getOctokit(options.token);
+
 		this.message = options.message;
-		this.branch = options.branch;
+		this.defaultBranch = options.branch || null;
 	}
 
 	async updateFiles(paths: string[]): Promise<string> {
-		const lastRef = await this.getLastRef();
+		const branch = await this.getBranch();
+		const lastRef = await this.getLastRef(branch);
 
 		const baseTreeSha = lastRef.treeSha;
 		const baseCommitSha = lastRef.commitSha;
 
-		const newTreeSha = await this.createTree(paths, baseTreeSha);
+		const newTreeSha = await this.createTree(branch, paths, baseTreeSha);
 		if (newTreeSha === null) {
 			return null;
 		}
 
 		const newCommitSha = await this.createCommit(newTreeSha, baseCommitSha);
-		return this.updateRef(newCommitSha);
+		return this.updateRef(newCommitSha, branch);
 	}
 
 	private async createCommit(tree: string, parent: string): Promise<string> {
@@ -67,12 +68,13 @@ export class Updater {
 	}
 
 	private async createTree(
-		paths: string[],
+		branch: string,
+		filePaths: string[],
 		base_tree: string
 	): Promise<string> {
 		const promises = Promise.all(
-			paths.map((path) => {
-				return this.createTreeItem(path);
+			filePaths.map((filePath) => {
+				return this.createTreeItem(filePath, branch);
 			})
 		);
 
@@ -93,22 +95,25 @@ export class Updater {
 		return data.sha;
 	}
 
-	private async createTreeItem(path: string): Promise<TreeItem> {
-		const remoteFile = await this.getRemoteContents(path);
+	private async createTreeItem(
+		filePath: string,
+		branch: string
+	): Promise<TreeItem> {
+		const remoteFile = await this.getRemoteContents(filePath, branch);
+		const localContents = await this.getLocalContents(filePath);
 		const remoteContents = remoteFile.content;
-		const localContents = await this.getLocalContents(path);
 
 		const mode = '100644';
 
 		if (localContents !== null) {
 			if (localContents !== remoteContents) {
 				const content = localContents;
-				return { mode, path, content };
+				return { mode, path: filePath, content };
 			}
 		} else if (remoteContents !== null) {
 			return {
 				mode,
-				path,
+				path: filePath,
 				sha: null,
 			};
 		}
@@ -116,11 +121,20 @@ export class Updater {
 		return null;
 	}
 
-	private async getLastRef(): Promise<RefInfo> {
+	private async getBranch(): Promise<string> {
+		if (this.defaultBranch !== null) {
+			return Promise.resolve(this.defaultBranch);
+		}
+
+		const { data } = await this.octokit.repos.get(context.repo);
+		return data.default_branch;
+	}
+
+	private async getLastRef(branch: string): Promise<RefInfo> {
 		const { data } = await this.octokit.repos.listCommits({
 			...context.repo,
 			per_page: 1,
-			sha: this.branch,
+			sha: branch,
 		});
 
 		const commitSha = data[0].sha;
@@ -137,7 +151,10 @@ export class Updater {
 		return null;
 	}
 
-	private async getRemoteContents(filePath: string): Promise<RemoteFile> {
+	private async getRemoteContents(
+		filePath: string,
+		branch: string
+	): Promise<RemoteFile> {
 		let content: string = null;
 		let sha: string = null;
 
@@ -145,7 +162,7 @@ export class Updater {
 			const { data } = await this.octokit.repos.getContent({
 				...context.repo,
 				path: filePath,
-				ref: this.branch,
+				ref: branch,
 			});
 
 			content = Buffer.from(data['content'], 'base64').toString();
@@ -158,8 +175,8 @@ export class Updater {
 		return { content, sha };
 	}
 
-	private async updateRef(sha: string): Promise<string> {
-		const ref = `heads/${this.branch}`;
+	private async updateRef(sha: string, branch: string): Promise<string> {
+		const ref = `heads/${branch}`;
 
 		const { data } = await this.octokit.git.updateRef({
 			...context.repo,

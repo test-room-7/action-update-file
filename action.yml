@@ -18,7 +18,6 @@ inputs:
   # Optional
   branch:
     description: Branch name
-    default: master
     requried: false
 
   allow-removing:
