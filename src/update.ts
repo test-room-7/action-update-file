@@ -28,13 +28,12 @@ type TreeItem = {
 };
 
 export class Updater {
-	private octokit: InstanceType<typeof GitHub>;
+	private octokit: ReturnType<typeof getOctokit>;
 	private message: string;
 	private branch: string;
 
 	constructor(options: UpdaterOptions) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-		this.octokit = getOctokit(options.token) as InstanceType<typeof GitHub>;
+		this.octokit = getOctokit(options.token);
 		this.message = options.message;
 		this.branch = options.branch;
 	}
