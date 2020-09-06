@@ -25,8 +25,8 @@ inputs:
     default: false
     required: false
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: node12
+  main: dist/index.js
 branding:
   icon: git-commit
   color: gray-dark
