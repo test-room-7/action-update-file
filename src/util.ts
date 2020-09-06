@@ -1,10 +1,10 @@
 import { getInput, InputOptions } from '@actions/core';
 
-export type UpdaterOptions = {
+export interface UpdaterOptions {
 	branch: string;
 	token: string;
 	message: string;
-};
+}
 
 export function getBooleanInput(name: string, options?: InputOptions): boolean {
 	const value = getInput(name, options).toLowerCase();
