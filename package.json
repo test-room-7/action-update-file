@@ -25,6 +25,8 @@
     "@vercel/ncc": "0.24.0",
     "eslint": "7.8.1",
     "eslint-config-web-scrobbler": "1.1.0",
+    "prettier": "^2.1.1",
+    "prettier-config-web-scrobbler": "^0.1.0",
     "typescript": "4.0.2"
   },
   "scripts": {
@@ -35,5 +37,6 @@
   },
   "eslintConfig": {
     "extends": "web-scrobbler/typescript"
-  }
+  },
+  "prettier": "prettier-config-web-scrobbler"
 }
