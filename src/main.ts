@@ -33,7 +33,7 @@ function main(): void {
 			const shortSha = commitSha.slice(0, 7);
 			info(`Pushed ${shortSha} to ${options.branch}`);
 		})
-		.catch((err) => {
+		.catch((err: Error) => {
 			setFailed(err.message);
 		});
 }

@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable camelcase */
 
 import { readFile, existsSync } from 'fs';
 import { promisify } from 'util';
 
-import { GitHub, context } from '@actions/github';
+import { getOctokit, context } from '@actions/github';
+import { GitHub } from '@actions/github/lib/utils';
+
 import { UpdaterOptions } from './util';
 
 const readFileAsync = promisify(readFile);
@@ -26,12 +28,13 @@ type TreeItem = {
 };
 
 export class Updater {
-	octokit: GitHub;
+	octokit: InstanceType<typeof GitHub>;
 	message: string;
 	branch: string;
 
 	constructor(options: UpdaterOptions) {
-		this.octokit = new GitHub(options.token);
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+		this.octokit = getOctokit(options.token) as InstanceType<typeof GitHub>;
 		this.message = options.message;
 		this.branch = options.branch;
 	}
@@ -141,13 +144,14 @@ export class Updater {
 		let sha: string = null;
 
 		try {
-			const { data } = await this.octokit.repos.getContents({
+			const { data } = await this.octokit.repos.getContent({
 				...context.repo,
 				path: filePath,
 				ref: this.branch,
 			});
 
 			content = Buffer.from(data['content'], 'base64').toString();
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			sha = data['sha'];
 		} catch (err) {
 			// Do nothing
