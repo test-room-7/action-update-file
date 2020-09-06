@@ -22,11 +22,13 @@ function main(): void {
 	const updater = new Updater(options);
 	updater
 		.updateFiles(pathsToUpdate)
-		.then(({ commitSha, branch }) => {
-			if (commitSha === null) {
+		.then((updateResult) => {
+			if (updateResult === null) {
 				info('No files to update');
 				return;
 			}
+
+			const { commitSha, branch } = updateResult;
 
 			setOutput('commit-sha', commitSha);
 

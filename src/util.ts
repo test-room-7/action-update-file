@@ -31,3 +31,7 @@ export function getActionOptions(): UpdaterOptions {
 
 	return { token, message, branch };
 }
+
+export function isNotNull<T>(arg: T): arg is Exclude<T, null> {
+	return arg !== null;
+}

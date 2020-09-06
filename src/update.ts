@@ -5,7 +5,7 @@ import { promisify } from 'util';
 
 import { getOctokit, context } from '@actions/github';
 
-import { UpdaterOptions } from './util';
+import { UpdaterOptions, isNotNull } from './util';
 
 const readFileAsync = promisify(readFile);
 
@@ -34,7 +34,7 @@ interface UpdateResult {
 export class Updater {
 	private octokit: ReturnType<typeof getOctokit>;
 	private message: string;
-	private defaultBranch: string;
+	private defaultBranch: string | null;
 
 	constructor(options: UpdaterOptions) {
 		this.octokit = getOctokit(options.token);
@@ -43,7 +43,7 @@ export class Updater {
 		this.defaultBranch = options.branch || null;
 	}
 
-	async updateFiles(paths: string[]): Promise<UpdateResult> {
+	async updateFiles(paths: string[]): Promise<UpdateResult | null> {
 		const branch = await this.getBranch();
 		const lastRef = await this.getLastRef(branch);
 
@@ -78,16 +78,14 @@ export class Updater {
 		branch: string,
 		filePaths: string[],
 		base_tree: string
-	): Promise<string> {
-		const promises = Promise.all(
-			filePaths.map((filePath) => {
-				return this.createTreeItem(filePath, branch);
-			})
-		);
-
-		const tree = (await promises).filter((change) => {
-			return change !== null;
-		});
+	): Promise<string | null> {
+		const tree = (
+			await Promise.all(
+				filePaths.map((filePath) => {
+					return this.createTreeItem(filePath, branch);
+				})
+			)
+		).filter(isNotNull);
 
 		if (tree.length === 0) {
 			return null;
@@ -105,10 +103,10 @@ export class Updater {
 	private async createTreeItem(
 		filePath: string,
 		branch: string
-	): Promise<TreeItem> {
+	): Promise<TreeItem | null> {
 		const remoteFile = await this.getRemoteContents(filePath, branch);
 		const localContents = await this.getLocalContents(filePath);
-		const remoteContents = remoteFile.content;
+		const remoteContents = remoteFile?.content || null;
 
 		const mode = '100644';
 
@@ -121,7 +119,6 @@ export class Updater {
 			return {
 				mode,
 				path: filePath,
-				sha: null,
 			};
 		}
 
@@ -150,7 +147,7 @@ export class Updater {
 		return { treeSha, commitSha };
 	}
 
-	private async getLocalContents(filePath: string): Promise<string> {
+	private async getLocalContents(filePath: string): Promise<string | null> {
 		if (existsSync(filePath)) {
 			return (await readFileAsync(filePath)).toString();
 		}
@@ -161,10 +158,7 @@ export class Updater {
 	private async getRemoteContents(
 		filePath: string,
 		branch: string
-	): Promise<RemoteFile> {
-		let content: string = null;
-		let sha: string = null;
-
+	): Promise<RemoteFile | null> {
 		try {
 			const { data } = await this.octokit.repos.getContent({
 				...context.repo,
@@ -172,14 +166,16 @@ export class Updater {
 				ref: branch,
 			});
 
-			content = Buffer.from(data['content'], 'base64').toString();
+			const content = Buffer.from(data['content'], 'base64').toString();
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			sha = data['sha'];
+			const sha = data['sha'];
+
+			return { content, sha };
 		} catch (err) {
 			// Do nothing
 		}
 
-		return { content, sha };
+		return null;
 	}
 
 	private async updateRef(sha: string, branch: string): Promise<string> {
