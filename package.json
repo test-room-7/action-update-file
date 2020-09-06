@@ -31,7 +31,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "dist": "tsc && ncc build",
+    "dist": "tsc && ncc build build/main.js",
     "lint": "eslint --ext .ts src",
     "version": "npm run build && git add dist"
   },
