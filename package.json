@@ -32,5 +32,8 @@
     "dist": "tsc && ncc build",
     "lint": "eslint --ext .ts src",
     "version": "npm run build && git add dist"
+  },
+  "eslintConfig": {
+    "extends": "web-scrobbler/typescript"
   }
 }
