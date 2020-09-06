@@ -26,14 +26,14 @@ function main() {
     const updater = new update_1.Updater(options);
     updater
         .updateFiles(pathsToUpdate)
-        .then((commitSha) => {
+        .then(({ commitSha, branch }) => {
         if (commitSha === null) {
             core_1.info('No files to update');
             return;
         }
         core_1.setOutput('commit-sha', commitSha);
         const shortSha = commitSha.slice(0, 7);
-        core_1.info(`Pushed ${shortSha} to ${options.branch}`);
+        core_1.info(`Pushed ${shortSha} to ${branch}`);
     })
         .catch((err) => {
         core_1.setFailed(err.message);
@@ -72,7 +72,8 @@ class Updater {
             return null;
         }
         const newCommitSha = await this.createCommit(newTreeSha, baseCommitSha);
-        return this.updateRef(newCommitSha, branch);
+        const commitSha = await this.updateRef(newCommitSha, branch);
+        return { commitSha, branch };
     }
     async createCommit(tree, parent) {
         const { message } = this;
