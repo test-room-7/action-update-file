@@ -22,7 +22,7 @@ function main(): void {
 	const updater = new Updater(options);
 	updater
 		.updateFiles(pathsToUpdate)
-		.then((commitSha) => {
+		.then(({ commitSha, branch }) => {
 			if (commitSha === null) {
 				info('No files to update');
 				return;
@@ -31,7 +31,7 @@ function main(): void {
 			setOutput('commit-sha', commitSha);
 
 			const shortSha = commitSha.slice(0, 7);
-			info(`Pushed ${shortSha} to ${options.branch}`);
+			info(`Pushed ${shortSha} to ${branch}`);
 		})
 		.catch((err: Error) => {
 			setFailed(err.message);

@@ -26,6 +26,11 @@ interface TreeItem {
 	sha?: string;
 }
 
+interface UpdateResult {
+	commitSha: string;
+	branch: string;
+}
+
 export class Updater {
 	private octokit: ReturnType<typeof getOctokit>;
 	private message: string;
@@ -38,7 +43,7 @@ export class Updater {
 		this.defaultBranch = options.branch || null;
 	}
 
-	async updateFiles(paths: string[]): Promise<string> {
+	async updateFiles(paths: string[]): Promise<UpdateResult> {
 		const branch = await this.getBranch();
 		const lastRef = await this.getLastRef(branch);
 
@@ -51,7 +56,9 @@ export class Updater {
 		}
 
 		const newCommitSha = await this.createCommit(newTreeSha, baseCommitSha);
-		return this.updateRef(newCommitSha, branch);
+		const commitSha = await this.updateRef(newCommitSha, branch);
+
+		return { commitSha, branch };
 	}
 
 	private async createCommit(tree: string, parent: string): Promise<string> {
