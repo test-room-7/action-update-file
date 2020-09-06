@@ -28,9 +28,9 @@ type TreeItem = {
 };
 
 export class Updater {
-	octokit: InstanceType<typeof GitHub>;
-	message: string;
-	branch: string;
+	private octokit: InstanceType<typeof GitHub>;
+	private message: string;
+	private branch: string;
 
 	constructor(options: UpdaterOptions) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -38,8 +38,6 @@ export class Updater {
 		this.message = options.message;
 		this.branch = options.branch;
 	}
-
-	/** Public methods. */
 
 	async updateFiles(paths: string[]): Promise<string> {
 		const lastRef = await this.getLastRef();
@@ -56,9 +54,7 @@ export class Updater {
 		return this.updateRef(newCommitSha);
 	}
 
-	/** Private methods. */
-
-	async createCommit(tree: string, parent: string): Promise<string> {
+	private async createCommit(tree: string, parent: string): Promise<string> {
 		const { message } = this;
 
 		const { data } = await this.octokit.git.createCommit({
@@ -71,7 +67,10 @@ export class Updater {
 		return data.sha;
 	}
 
-	async createTree(paths: string[], base_tree: string): Promise<string> {
+	private async createTree(
+		paths: string[],
+		base_tree: string
+	): Promise<string> {
 		const promises = Promise.all(
 			paths.map((path) => {
 				return this.createTreeItem(path);
@@ -95,7 +94,7 @@ export class Updater {
 		return data.sha;
 	}
 
-	async createTreeItem(path: string): Promise<TreeItem> {
+	private async createTreeItem(path: string): Promise<TreeItem> {
 		const remoteFile = await this.getRemoteContents(path);
 		const remoteContents = remoteFile.content;
 		const localContents = await this.getLocalContents(path);
@@ -118,7 +117,7 @@ export class Updater {
 		return null;
 	}
 
-	async getLastRef(): Promise<RefInfo> {
+	private async getLastRef(): Promise<RefInfo> {
 		const { data } = await this.octokit.repos.listCommits({
 			...context.repo,
 			per_page: 1,
@@ -131,7 +130,7 @@ export class Updater {
 		return { treeSha, commitSha };
 	}
 
-	async getLocalContents(filePath: string): Promise<string> {
+	private async getLocalContents(filePath: string): Promise<string> {
 		if (existsSync(filePath)) {
 			return (await readFileAsync(filePath)).toString();
 		}
@@ -139,7 +138,7 @@ export class Updater {
 		return null;
 	}
 
-	async getRemoteContents(filePath: string): Promise<RemoteFile> {
+	private async getRemoteContents(filePath: string): Promise<RemoteFile> {
 		let content: string = null;
 		let sha: string = null;
 
@@ -160,7 +159,7 @@ export class Updater {
 		return { content, sha };
 	}
 
-	async updateRef(sha: string): Promise<string> {
+	private async updateRef(sha: string): Promise<string> {
 		const ref = `heads/${this.branch}`;
 
 		const { data } = await this.octokit.git.updateRef({
