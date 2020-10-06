@@ -1,4 +1,5 @@
 import { getInput, InputOptions } from '@actions/core';
+import { isDynamicPattern, sync as globSync } from 'fast-glob';
 
 export interface UpdaterOptions {
 	branch: string;
@@ -21,7 +22,7 @@ export function getBooleanInput(name: string, options?: InputOptions): boolean {
 
 export function getPathsToUpdate(): string[] {
 	const rawPaths = getInput('file-path');
-	return rawPaths.split(/\r?\n/).map((path) => path.trim());
+	return flatten(rawPaths.split(/\r?\n/).map(expandPathPattern));
 }
 
 export function getActionOptions(): UpdaterOptions {
@@ -34,4 +35,18 @@ export function getActionOptions(): UpdaterOptions {
 
 export function isNotNull<T>(arg: T): arg is Exclude<T, null> {
 	return arg !== null;
+}
+
+function expandPathPattern(path: string): string[] {
+	const pathPattern = path.trim();
+
+	if (isDynamicPattern(pathPattern)) {
+		return globSync(pathPattern);
+	}
+
+	return [pathPattern];
+}
+
+function flatten<T>(items: T[][]): T[] {
+	return items.reduce((collection, item) => collection.concat(item), []);
 }

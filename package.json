@@ -16,7 +16,8 @@
   ],
   "dependencies": {
     "@actions/core": "1.2.6",
-    "@actions/github": "4.0.0"
+    "@actions/github": "4.0.0",
+    "fast-glob": "3.2.4"
   },
   "devDependencies": {
     "@types/node": "14.6.4",
