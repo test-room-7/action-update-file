@@ -6,6 +6,8 @@ Update (i.e. commit and push) files on GitHub.
 
 The action requires GitHub token for authentication; no username or e-mail are required.
 
+### Basic usage
+
 Here is an example of a workflow using `action-update-file`:
 
 <details>
@@ -33,6 +35,8 @@ jobs:
 </details>
 
 Note that this action does not change files. They should be changed with scripts and/or other actions.
+
+### Update multiple files
 
 You can also update multiple files:
 
@@ -62,6 +66,8 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 </details>
+
+### Use glob patterns
 
 The action supports glob patterns as well:
 
