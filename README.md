@@ -88,7 +88,7 @@ jobs:
               run: ./scripts/fetch-resources.sh
             - name: Update resources
               uses: test-room-7/action-update-file@v1
-			  with:
+        with:
                   # Include all JS files from the `dist` directory
                   file-path: dist/*.js
                   commit-msg: Update resources
