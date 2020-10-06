@@ -63,6 +63,35 @@ jobs:
 ```
 </details>
 
+The action supports glob patterns as well:
+
+<details>
+  <summary>workflow.yml (Click to expand)</summary>
+
+```yml
+name: Resources
+on: repository_dispatch
+jobs:
+    resources:
+        name: Update resources
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+            - uses: actions/setup-node@v1
+            - name: Fetch resources
+              run: ./scripts/fetch-resources.sh
+            - name: Update resources
+              uses: test-room-7/action-update-file@v1
+			  with:
+                  # Include all JS files from the `dist` directory
+                  file-path: dist/*.js
+                  commit-msg: Update resources
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+</details>
+
+See the `fast-glob` [documentation][glob-docs] for glob syntax.
+
 ### Inputs
 
 #### Required inputs
@@ -102,6 +131,7 @@ Don't push dist files; they're updated automatically by the action itself.
 
 Licensed under the [MIT License](./LICENSE.md).
 
+[glob-docs]: https://github.com/mrmlnc/fast-glob#pattern-syntax
 [version-badge]: https://img.shields.io/github/v/release/test-room-7/action-update-file
 [version-url]: https://github.com/marketplace/actions/update-files-on-github
 [workflow-badge]: https://img.shields.io/github/workflow/status/test-room-7/action-update-file/Lint?label=lint
