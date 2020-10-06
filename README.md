@@ -8,6 +8,9 @@ The action requires GitHub token for authentication; no username or e-mail are r
 
 Here is an example of a workflow using `action-update-file`:
 
+<details>
+  <summary>workflow.yml (Click to expand)</summary>
+
 ```yml
 name: Resources
 on: repository_dispatch
@@ -27,10 +30,14 @@ jobs:
                   commit-msg: Update resources
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
+</details>
 
 Note that this action does not change files. They should be changed with scripts and/or other actions.
 
 You can also update multiple files:
+
+<details>
+  <summary>workflow.yml (Click to expand)</summary>
 
 ```yml
 name: Resources
@@ -54,6 +61,7 @@ jobs:
                   commit-msg: Update resources
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
+</details>
 
 ### Inputs
 
