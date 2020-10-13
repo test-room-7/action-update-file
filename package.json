@@ -5,7 +5,6 @@
   "author": "Alexey <alex.esprit@gmail.com>",
   "description": "Update (i.e. commit and push) files on GitHub",
   "license": "MIT",
-  "main": "lib/main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/test-room-7/action-update-file.git"
