@@ -14,11 +14,6 @@ interface RefInfo {
 	commitSha: string;
 }
 
-interface RemoteFile {
-	content: string;
-	sha: string;
-}
-
 interface TreeItem {
 	content?: string;
 	mode?: '100644' | '100755' | '040000' | '160000' | '120000';
@@ -104,9 +99,8 @@ export class Updater {
 		filePath: string,
 		branch: string
 	): Promise<TreeItem | null> {
-		const remoteFile = await this.getRemoteContents(filePath, branch);
+		const remoteContents = await this.getRemoteContents(filePath, branch);
 		const localContents = await this.getLocalContents(filePath);
-		const remoteContents = remoteFile?.content || null;
 
 		const mode = '100644';
 
@@ -158,7 +152,7 @@ export class Updater {
 	private async getRemoteContents(
 		filePath: string,
 		branch: string
-	): Promise<RemoteFile | null> {
+	): Promise<string | null> {
 		try {
 			const { data } = await this.octokit.repos.getContent({
 				...context.repo,
@@ -166,11 +160,7 @@ export class Updater {
 				ref: branch,
 			});
 
-			const content = Buffer.from(data['content'], 'base64').toString();
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const sha = data['sha'];
-
-			return { content, sha };
+			return Buffer.from(data['content'], 'base64').toString();
 		} catch (err) {
 			// Do nothing
 		}
