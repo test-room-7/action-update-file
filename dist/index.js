@@ -95,14 +95,18 @@ class Updater {
         return data.sha;
     }
     async createTreeItem(filePath, branch) {
-        const remoteFile = await this.getRemoteContents(filePath, branch);
+        const remoteContents = await this.getRemoteContents(filePath, branch);
         const localContents = await this.getLocalContents(filePath);
-        const remoteContents = (remoteFile === null || remoteFile === void 0 ? void 0 : remoteFile.content) || null;
         const mode = '100644';
         if (localContents !== null) {
             if (localContents !== remoteContents) {
                 const content = localContents;
-                return { mode, path: filePath, content };
+                const { data } = await this.octokit.git.createBlob(Object.assign(Object.assign({}, github_1.context.repo), { content, encoding: 'base64' }));
+                return {
+                    mode,
+                    path: filePath,
+                    sha: data.sha,
+                };
             }
         }
         else if (remoteContents !== null) {
@@ -128,17 +132,14 @@ class Updater {
     }
     async getLocalContents(filePath) {
         if (fs_1.existsSync(filePath)) {
-            return (await readFileAsync(filePath)).toString();
+            return (await readFileAsync(filePath)).toString('base64');
         }
         return null;
     }
     async getRemoteContents(filePath, branch) {
         try {
             const { data } = await this.octokit.repos.getContent(Object.assign(Object.assign({}, github_1.context.repo), { path: filePath, ref: branch }));
-            const content = Buffer.from(data['content'], 'base64').toString();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const sha = data['sha'];
-            return { content, sha };
+            return data.content;
         }
         catch (err) {
             // Do nothing

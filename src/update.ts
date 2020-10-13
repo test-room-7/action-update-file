@@ -101,13 +101,23 @@ export class Updater {
 	): Promise<TreeItem | null> {
 		const remoteContents = await this.getRemoteContents(filePath, branch);
 		const localContents = await this.getLocalContents(filePath);
-
 		const mode = '100644';
 
 		if (localContents !== null) {
 			if (localContents !== remoteContents) {
 				const content = localContents;
-				return { mode, path: filePath, content };
+
+				const { data } = await this.octokit.git.createBlob({
+					...context.repo,
+					content,
+					encoding: 'base64',
+				});
+
+				return {
+					mode,
+					path: filePath,
+					sha: data.sha,
+				};
 			}
 		} else if (remoteContents !== null) {
 			return {
@@ -143,7 +153,7 @@ export class Updater {
 
 	private async getLocalContents(filePath: string): Promise<string | null> {
 		if (existsSync(filePath)) {
-			return (await readFileAsync(filePath)).toString();
+			return (await readFileAsync(filePath)).toString('base64');
 		}
 
 		return null;
@@ -160,7 +170,7 @@ export class Updater {
 				ref: branch,
 			});
 
-			return Buffer.from(data['content'], 'base64').toString();
+			return data.content.replace(/\n/gi, '');
 		} catch (err) {
 			// Do nothing
 		}
