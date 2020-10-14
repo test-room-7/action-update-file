@@ -3,9 +3,11 @@
 import { readFile, existsSync } from 'fs';
 import { promisify } from 'util';
 
-import { getOctokit, context } from '@actions/github';
+import { GitHub } from '@actions/github/lib/utils';
+import { context } from '@actions/github';
 
 import { UpdaterOptions, isNotNull } from './util';
+import { createOctokit } from './octokit';
 
 const readFileAsync = promisify(readFile);
 
@@ -27,12 +29,12 @@ interface UpdateResult {
 }
 
 export class Updater {
-	private octokit: ReturnType<typeof getOctokit>;
+	private octokit: InstanceType<typeof GitHub>;
 	private message: string;
 	private defaultBranch: string | null;
 
 	constructor(options: UpdaterOptions) {
-		this.octokit = getOctokit(options.token);
+		this.octokit = createOctokit(options.token);
 
 		this.message = options.message;
 		this.defaultBranch = options.branch || null;
