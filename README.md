@@ -10,9 +10,6 @@ The action requires GitHub token for authentication; no username or e-mail are r
 
 Here is an example of a workflow using `action-update-file`:
 
-<details>
-  <summary>workflow.yml (Click to expand)</summary>
-
 ```yml
 name: Resources
 on: repository_dispatch
@@ -22,9 +19,12 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v1
+
             - uses: actions/setup-node@v1
+
             - name: Fetch resources
               run: ./scripts/fetch-resources.sh
+
             - name: Update resources
               uses: test-room-7/action-update-file@v1
               with:
@@ -32,7 +32,6 @@ jobs:
                   commit-msg: Update resources
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
-</details>
 
 Note that this action does not change files. They should be changed with scripts and/or other actions.
 
@@ -40,61 +39,31 @@ Note that this action does not change files. They should be changed with scripts
 
 You can also update multiple files:
 
-<details>
-  <summary>workflow.yml (Click to expand)</summary>
-
 ```yml
-name: Resources
-on: repository_dispatch
-jobs:
-    resources:
-        name: Update resources
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v1
-            - uses: actions/setup-node@v1
-            - name: Fetch resources
-              run: ./scripts/fetch-resources.sh
-            - name: Update resources
-              uses: test-room-7/action-update-file@v1
-              with:
-                  file-path: |
-                      path/to/file1
-                      path/to/file2
-                      path/to/file3
-                  commit-msg: Update resources
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
+- name: Update resources
+  uses: test-room-7/action-update-file@v1
+  with:
+      file-path: |
+          path/to/file1
+          path/to/file2
+          path/to/file3
+      commit-msg: Update resources
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
-</details>
 
 ### Use glob patterns
 
 The action supports glob patterns as well:
 
-<details>
-  <summary>workflow.yml (Click to expand)</summary>
-
 ```yml
-name: Resources
-on: repository_dispatch
-jobs:
-    resources:
-        name: Update resources
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v1
-            - uses: actions/setup-node@v1
-            - name: Fetch resources
-              run: ./scripts/fetch-resources.sh
-            - name: Update resources
-              uses: test-room-7/action-update-file@v1
-        with:
-                  # Include all JS files from the `dist` directory
-                  file-path: dist/*.js
-                  commit-msg: Update resources
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
+- name: Update resources
+  uses: test-room-7/action-update-file@v1
+  with:
+      # Include all JS files from the `dist` directory
+      file-path: dist/*.js
+      commit-msg: Update resources
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
-</details>
 
 See the `fast-glob` [documentation][glob-docs] for glob syntax.
 
