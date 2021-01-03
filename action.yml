@@ -20,6 +20,11 @@ inputs:
     description: Branch name
     requried: false
 
+  allow-dot:
+    description: Allow glob patterns to match entries that begin with a period
+    default: false
+    required: false
+
   allow-removing:
     desciption: Allow to remove file
     default: false

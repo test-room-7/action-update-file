@@ -80,6 +80,7 @@ See the `fast-glob` [documentation][glob-docs] for glob syntax.
 #### Optional inputs
 
 -   `branch`: branch to push changes (the default branch is used if no `branch` is specified)
+-   `allow-dot`: allow glob patterns to match entries that begin with a period (`false` by default)
 -   `allow-removing`: allow to remove file if local copy is missing
     (`false` by default)
 

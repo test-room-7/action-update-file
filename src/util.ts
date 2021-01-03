@@ -22,7 +22,13 @@ export function getBooleanInput(name: string, options?: InputOptions): boolean {
 
 export function getPathsToUpdate(): string[] {
 	const rawPaths = getInput('file-path');
-	return flatten(rawPaths.split(/\r?\n/).map(expandPathPattern));
+	const allowDot = getBooleanInput('allow-dot');
+
+	return flatten(
+		rawPaths.split(/\r?\n/).map((path) => {
+			return expandPathPattern(path, { dot: allowDot });
+		})
+	);
 }
 
 export function getActionOptions(): UpdaterOptions {
@@ -37,11 +43,11 @@ export function isNotNull<T>(arg: T): arg is Exclude<T, null> {
 	return arg !== null;
 }
 
-function expandPathPattern(path: string): string[] {
+function expandPathPattern(path: string, { dot = false }): string[] {
 	const pathPattern = path.trim();
 
 	if (isDynamicPattern(pathPattern)) {
-		return globSync(pathPattern);
+		return globSync(pathPattern, { dot });
 	}
 
 	return [pathPattern];
