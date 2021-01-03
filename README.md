@@ -74,7 +74,7 @@ See the `fast-glob` [documentation][glob-docs] for glob syntax.
 #### Required inputs
 
 -   `commit-msg`: a text used as a commit message
--   `file-path`: a path to file to be updated
+-   `file-path`: a path to file(s) or a glob pattern
 -   `github-token`: GitHub token
 
 #### Optional inputs

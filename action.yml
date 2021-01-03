@@ -8,7 +8,7 @@ inputs:
     requried: true
 
   file-path:
-    description: Path to file to update
+    description: Path to file(s) or glob pattern
     requried: true
 
   github-token:
