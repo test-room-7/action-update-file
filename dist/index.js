@@ -214,7 +214,10 @@ function getBooleanInput(name, options) {
 exports.getBooleanInput = getBooleanInput;
 function getPathsToUpdate() {
     const rawPaths = core_1.getInput('file-path');
-    return flatten(rawPaths.split(/\r?\n/).map(expandPathPattern));
+    const allowDot = getBooleanInput('allow-dot');
+    return flatten(rawPaths.split(/\r?\n/).map((path) => {
+        return expandPathPattern(path, { dot: allowDot });
+    }));
 }
 exports.getPathsToUpdate = getPathsToUpdate;
 function getActionOptions() {
@@ -228,10 +231,10 @@ function isNotNull(arg) {
     return arg !== null;
 }
 exports.isNotNull = isNotNull;
-function expandPathPattern(path) {
+function expandPathPattern(path, { dot = false }) {
     const pathPattern = path.trim();
     if (fast_glob_1.isDynamicPattern(pathPattern)) {
-        return fast_glob_1.sync(pathPattern);
+        return fast_glob_1.sync(pathPattern, { dot });
     }
     return [pathPattern];
 }
