@@ -30,12 +30,12 @@ inputs:
     default: false
     required: false
 
-  commiter-name:
+  committer-name:
     description: The name of the author (or committer) of the commit
     default: 'github-actions[bot]'
     required: false
 
-  commiter-email:
+  committer-email:
     description: The email of the author (or committer) of the commit
     default: 'github-actions[bot]@users.noreply.github.com'
     required: false

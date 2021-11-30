@@ -83,8 +83,8 @@ See the `fast-glob` [documentation][glob-docs] for glob syntax.
 -   `allow-dot`: allow glob patterns to match entries that begin with a period (`false` by default)
 -   `allow-removing`: allow to remove file if local copy is missing
     (`false` by default)
--   `commiter-name`: The name of the author (or committer) of the commit. (`github-actions[bot]` by default)
--   `commiter-email`: The email of the author (or committer) of the commit. (`github-actions[bot]@users.noreply.github.com` by default)
+-   `committer-name`: The name of the author (or committer) of the commit. (`github-actions[bot]` by default)
+-   `committer-email`: The email of the author (or committer) of the commit. (`github-actions[bot]@users.noreply.github.com` by default)
 
 Note that the action will produce an error if a local copy of a given file is missing, and the `allow-removing` flag is `false`.
 
