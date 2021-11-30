@@ -97,6 +97,8 @@ class Updater {
         this.octokit = octokit_1.createOctokit(options.token);
         this.message = options.message;
         this.defaultBranch = options.branch || null;
+        this.commiterName = options.commiterName;
+        this.commiterEmail = options.commiterEmail;
     }
     async updateFiles(paths) {
         const branch = await this.getBranch();
@@ -114,7 +116,10 @@ class Updater {
     async createCommit(tree, parent) {
         const { message } = this;
         const { data } = await this.octokit.git.createCommit(Object.assign(Object.assign({}, github_1.context.repo), { message,
-            tree, parents: [parent] }));
+            tree, parents: [parent], author: {
+                name: this.commiterName,
+                email: this.commiterEmail,
+            } }));
         return data.sha;
     }
     async createTree(branch, filePaths, base_tree) {
@@ -224,7 +229,9 @@ function getActionOptions() {
     const token = core_1.getInput('github-token', { required: true });
     const message = core_1.getInput('commit-msg', { required: true });
     const branch = core_1.getInput('branch');
-    return { token, message, branch };
+    const commiterName = core_1.getInput('commiter-name');
+    const commiterEmail = core_1.getInput('commiter-email');
+    return { token, message, branch, commiterName, commiterEmail };
 }
 exports.getActionOptions = getActionOptions;
 function isNotNull(arg) {
