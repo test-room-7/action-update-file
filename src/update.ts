@@ -32,12 +32,16 @@ export class Updater {
 	private octokit: InstanceType<typeof GitHub>;
 	private message: string;
 	private defaultBranch: string | null;
+	private committerName: string;
+	private committerEmail: string;
 
 	constructor(options: UpdaterOptions) {
 		this.octokit = createOctokit(options.token);
 
 		this.message = options.message;
 		this.defaultBranch = options.branch || null;
+		this.committerName = options.committerName;
+		this.committerEmail = options.committerEmail;
 	}
 
 	async updateFiles(paths: string[]): Promise<UpdateResult | null> {
@@ -66,6 +70,10 @@ export class Updater {
 			message,
 			tree,
 			parents: [parent],
+			author: {
+				name: this.committerName,
+				email: this.committerEmail,
+			},
 		});
 
 		return data.sha;

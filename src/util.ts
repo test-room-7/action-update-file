@@ -5,6 +5,8 @@ export interface UpdaterOptions {
 	branch: string;
 	token: string;
 	message: string;
+	committerName: string;
+	committerEmail: string;
 }
 
 export function getBooleanInput(name: string, options?: InputOptions): boolean {
@@ -35,8 +37,10 @@ export function getActionOptions(): UpdaterOptions {
 	const token = getInput('github-token', { required: true });
 	const message = getInput('commit-msg', { required: true });
 	const branch = getInput('branch');
+	const committerName = getInput('committer-name');
+	const committerEmail = getInput('committer-email');
 
-	return { token, message, branch };
+	return { token, message, branch, committerName, committerEmail };
 }
 
 export function isNotNull<T>(arg: T): arg is Exclude<T, null> {
