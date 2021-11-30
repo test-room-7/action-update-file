@@ -29,6 +29,17 @@ inputs:
     desciption: Allow to remove file
     default: false
     required: false
+
+  commiter-name:
+    description: The name of the author (or committer) of the commit
+    default: 'github-actions[bot]'
+    required: false
+
+  commiter-email:
+    description: The email of the author (or committer) of the commit
+    default: 'github-actions[bot]@users.noreply.github.com'
+    required: false
+
 runs:
   using: node12
   main: dist/index.js
