@@ -67,8 +67,8 @@ export class Updater {
 
 		const { data } = await this.octokit.git.createCommit({
 			...context.repo,
-			message,
-			tree,
+			message: message,
+			tree: tree,
 			parents: [parent],
 			author: {
 				name: this.committerName,
@@ -119,19 +119,19 @@ export class Updater {
 
 				const { data } = await this.octokit.git.createBlob({
 					...context.repo,
-					content,
+					content: content,
 					encoding: 'base64',
 				});
 
 				return {
-					mode,
+					mode: mode,
 					path: filePath,
 					sha: data.sha,
 				};
 			}
 		} else if (remoteContents !== null) {
 			return {
-				mode,
+				mode: mode,
 				path: filePath,
 			};
 		}
