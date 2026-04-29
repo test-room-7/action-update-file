@@ -83,10 +83,14 @@ See the `fast-glob` [documentation][glob-docs] for glob syntax.
 -   `allow-dot`: allow glob patterns to match entries that begin with a period (`false` by default)
 -   `allow-removing`: allow to remove file if local copy is missing
     (`false` by default)
+-   `respect-gitignore`: skip adding new files when they are ignored by
+    `.gitignore` files in the workspace (`false` by default)
 -   `committer-name`: The name of the author (or committer) of the commit. (`github-actions[bot]` by default)
 -   `committer-email`: The email of the author (or committer) of the commit. (`github-actions[bot]@users.noreply.github.com` by default)
 
 Note that the action will produce an error if a local copy of a given file is missing, and the `allow-removing` flag is `false`.
+
+When `respect-gitignore` is enabled, ignored files are skipped only for new additions. Existing files already present on the target branch can still be updated.
 
 ### Outputs
 
@@ -103,6 +107,9 @@ Note that the action will produce an error if a local copy of a given file is mi
 
 # Lint project files
 > npm run lint
+
+# Run tests
+> npm test
 ```
 
 Don't push dist files; they're updated automatically by the action itself.

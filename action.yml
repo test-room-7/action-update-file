@@ -30,6 +30,11 @@ inputs:
     default: false
     required: false
 
+  respect-gitignore:
+    description: Skip new file additions when the local file is ignored by .gitignore
+    default: false
+    required: false
+
   committer-name:
     description: The name of the author (or committer) of the commit
     default: 'github-actions[bot]'

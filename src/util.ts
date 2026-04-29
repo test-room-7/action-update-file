@@ -7,6 +7,7 @@ export interface UpdaterOptions {
 	message: string;
 	committerName: string;
 	committerEmail: string;
+	respectGitignore: boolean;
 }
 
 export function getBooleanInput(name: string, options?: InputOptions): boolean {
@@ -39,8 +40,16 @@ export function getActionOptions(): UpdaterOptions {
 	const branch = getInput('branch');
 	const committerName = getInput('committer-name');
 	const committerEmail = getInput('committer-email');
+	const respectGitignore = getBooleanInput('respect-gitignore');
 
-	return { token, message, branch, committerName, committerEmail };
+	return {
+		token,
+		message,
+		branch,
+		committerName,
+		committerEmail,
+		respectGitignore,
+	};
 }
 
 export function isNotNull<T>(arg: T): arg is Exclude<T, null> {

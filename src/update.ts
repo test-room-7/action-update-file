@@ -1,15 +1,108 @@
 /* eslint-disable camelcase */
 
 import { readFile, existsSync } from 'fs';
+import { dirname, relative, resolve, sep } from 'path';
 import { promisify } from 'util';
 
+import { info } from '@actions/core';
 import { GitHub } from '@actions/github/lib/utils';
 import { context } from '@actions/github';
+import * as nodeIgnore from 'ignore';
+type Ignore = nodeIgnore.Ignore;
 
 import { UpdaterOptions, isNotNull } from './util';
 import { createOctokit } from './octokit';
 
 const readFileAsync = promisify(readFile);
+
+export class GitignoreMatcher {
+	private rootDir: string;
+	private matchers = new Map<string, Promise<Ignore | null>>();
+
+	constructor(rootDir: string) {
+		this.rootDir = resolve(rootDir);
+	}
+
+	async ignores(filePath: string): Promise<boolean> {
+		const absoluteFilePath = resolve(filePath);
+		const relativeFilePath = normalizePath(
+			relative(this.rootDir, absoluteFilePath)
+		);
+
+		if (
+			relativeFilePath === '' ||
+			relativeFilePath === '.' ||
+			relativeFilePath.startsWith('../')
+		) {
+			return false;
+		}
+
+		let ignored = false;
+
+		for (const relativeDirPath of getRelativeDirPaths(relativeFilePath)) {
+			const matcher = await this.getMatcher(relativeDirPath);
+			if (matcher === null) {
+				continue;
+			}
+
+			const absoluteDirPath = resolve(this.rootDir, relativeDirPath);
+			const pathFromDir = normalizePath(
+				relative(absoluteDirPath, absoluteFilePath)
+			);
+			const result = matcher.test(pathFromDir);
+
+			if (result.ignored || result.unignored) {
+				ignored = result.ignored;
+			}
+		}
+
+		return ignored;
+	}
+
+	private async getMatcher(relativeDirPath: string): Promise<Ignore | null> {
+		let matcherPromise = this.matchers.get(relativeDirPath);
+
+		if (matcherPromise === undefined) {
+			matcherPromise = this.loadMatcher(relativeDirPath);
+			this.matchers.set(relativeDirPath, matcherPromise);
+		}
+
+		return matcherPromise;
+	}
+
+	private async loadMatcher(relativeDirPath: string): Promise<Ignore | null> {
+		const gitignorePath = resolve(this.rootDir, relativeDirPath, '.gitignore');
+
+		if (!existsSync(gitignorePath)) {
+			return null;
+		}
+
+		const patterns = (await readFileAsync(gitignorePath)).toString();
+		return nodeIgnore.default().add(patterns);
+	}
+}
+
+function normalizePath(filePath: string): string {
+	return filePath.split(sep).join('/');
+}
+
+function getRelativeDirPaths(filePath: string): string[] {
+	const parentDir = dirname(filePath);
+
+	if (parentDir === '.') {
+		return ['.'];
+	}
+
+	const directories = ['.'];
+	let currentPath = '';
+
+	for (const segment of parentDir.split('/')) {
+		currentPath = currentPath ? `${currentPath}/${segment}` : segment;
+		directories.push(currentPath);
+	}
+
+	return directories;
+}
 
 interface RefInfo {
 	treeSha: string;
@@ -34,6 +127,8 @@ export class Updater {
 	private defaultBranch: string | null;
 	private committerName: string;
 	private committerEmail: string;
+	private respectGitignore: boolean;
+	private gitignoreMatcher: GitignoreMatcher;
 
 	constructor(options: UpdaterOptions) {
 		this.octokit = createOctokit(options.token);
@@ -42,6 +137,8 @@ export class Updater {
 		this.defaultBranch = options.branch || null;
 		this.committerName = options.committerName;
 		this.committerEmail = options.committerEmail;
+		this.respectGitignore = options.respectGitignore;
+		this.gitignoreMatcher = new GitignoreMatcher(process.cwd());
 	}
 
 	async updateFiles(paths: string[]): Promise<UpdateResult | null> {
@@ -114,6 +211,15 @@ export class Updater {
 		const mode = '100644';
 
 		if (localContents !== null) {
+			if (
+				remoteContents === null &&
+				this.respectGitignore &&
+				(await this.gitignoreMatcher.ignores(filePath))
+			) {
+				info(`Skipping ignored file: ${filePath}`);
+				return null;
+			}
+
 			if (localContents !== remoteContents) {
 				const content = localContents;
 
