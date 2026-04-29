@@ -114,5 +114,5 @@ Licensed under the [MIT License](./LICENSE.md).
 [glob-docs]: https://github.com/mrmlnc/fast-glob#pattern-syntax
 [version-badge]: https://img.shields.io/github/v/release/test-room-7/action-update-file
 [version-url]: https://github.com/marketplace/actions/update-files-on-github
-[workflow-badge]: https://img.shields.io/github/workflow/status/test-room-7/action-update-file/Lint?label=lint
+[workflow-badge]: https://img.shields.io/github/actions/workflow/status/test-room-7/action-update-file/lint.yml
 [workflow-url]: https://github.com/test-room-7/action-update-file/actions
