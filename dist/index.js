@@ -13,7 +13,7 @@ const utils_1 = __nccwpck_require__(3030);
 const OctokitConstructor = utils_1.GitHub.plugin(plugin_throttling_1.throttling);
 const maxRetryCount = 1;
 function createOctokit(accessToken) {
-    const octokit = new OctokitConstructor((0, utils_1.getOctokitOptions)(accessToken, {
+    const octokit = new OctokitConstructor(utils_1.getOctokitOptions(accessToken, {
         throttle: { onRateLimit, onAbuseLimit },
     }));
     return octokit;
@@ -50,15 +50,15 @@ const github_1 = __nccwpck_require__(5438);
 const nodeIgnore = __nccwpck_require__(4777);
 const util_2 = __nccwpck_require__(9731);
 const octokit_1 = __nccwpck_require__(5801);
-const readFileAsync = (0, util_1.promisify)(fs_1.readFile);
+const readFileAsync = util_1.promisify(fs_1.readFile);
 class GitignoreMatcher {
     constructor(rootDir) {
         this.matchers = new Map();
-        this.rootDir = (0, path_1.resolve)(rootDir);
+        this.rootDir = path_1.resolve(rootDir);
     }
     async ignores(filePath) {
-        const absoluteFilePath = (0, path_1.resolve)(filePath);
-        const relativeFilePath = normalizePath((0, path_1.relative)(this.rootDir, absoluteFilePath));
+        const absoluteFilePath = path_1.resolve(filePath);
+        const relativeFilePath = normalizePath(path_1.relative(this.rootDir, absoluteFilePath));
         if (relativeFilePath === '' ||
             relativeFilePath === '.' ||
             relativeFilePath.startsWith('../')) {
@@ -70,8 +70,8 @@ class GitignoreMatcher {
             if (matcher === null) {
                 continue;
             }
-            const absoluteDirPath = (0, path_1.resolve)(this.rootDir, relativeDirPath);
-            const pathFromDir = normalizePath((0, path_1.relative)(absoluteDirPath, absoluteFilePath));
+            const absoluteDirPath = path_1.resolve(this.rootDir, relativeDirPath);
+            const pathFromDir = normalizePath(path_1.relative(absoluteDirPath, absoluteFilePath));
             const result = matcher.test(pathFromDir);
             if (result.ignored || result.unignored) {
                 ignored = result.ignored;
@@ -88,8 +88,8 @@ class GitignoreMatcher {
         return matcherPromise;
     }
     async loadMatcher(relativeDirPath) {
-        const gitignorePath = (0, path_1.resolve)(this.rootDir, relativeDirPath, '.gitignore');
-        if (!(0, fs_1.existsSync)(gitignorePath)) {
+        const gitignorePath = path_1.resolve(this.rootDir, relativeDirPath, '.gitignore');
+        if (!fs_1.existsSync(gitignorePath)) {
             return null;
         }
         const patterns = (await readFileAsync(gitignorePath)).toString();
@@ -101,7 +101,7 @@ function normalizePath(filePath) {
     return filePath.split(path_1.sep).join('/');
 }
 function getRelativeDirPaths(filePath) {
-    const parentDir = (0, path_1.dirname)(filePath);
+    const parentDir = path_1.dirname(filePath);
     if (parentDir === '.') {
         return ['.'];
     }
@@ -115,7 +115,7 @@ function getRelativeDirPaths(filePath) {
 }
 class Updater {
     constructor(options) {
-        this.octokit = (0, octokit_1.createOctokit)(options.token);
+        this.octokit = octokit_1.createOctokit(options.token);
         this.message = options.message;
         this.defaultBranch = options.branch || null;
         this.committerName = options.committerName;
@@ -163,7 +163,7 @@ class Updater {
             if (remoteContents === null &&
                 this.respectGitignore &&
                 (await this.gitignoreMatcher.ignores(filePath))) {
-                (0, core_1.info)(`Skipping ignored file: ${filePath}`);
+                core_1.info(`Skipping ignored file: ${filePath}`);
                 return null;
             }
             if (localContents !== remoteContents) {
@@ -198,7 +198,7 @@ class Updater {
         return { treeSha, commitSha };
     }
     async getLocalContents(filePath) {
-        if ((0, fs_1.existsSync)(filePath)) {
+        if (fs_1.existsSync(filePath)) {
             return (await readFileAsync(filePath)).toString('base64');
         }
         return null;
@@ -235,7 +235,7 @@ exports.isNotNull = exports.getActionOptions = exports.getPathsToUpdate = export
 const core_1 = __nccwpck_require__(2186);
 const fast_glob_1 = __nccwpck_require__(3664);
 function getBooleanInput(name, options) {
-    const value = (0, core_1.getInput)(name, options).toLowerCase();
+    const value = core_1.getInput(name, options).toLowerCase();
     if (value === 'true') {
         return true;
     }
@@ -246,7 +246,7 @@ function getBooleanInput(name, options) {
 }
 exports.getBooleanInput = getBooleanInput;
 function getPathsToUpdate() {
-    const rawPaths = (0, core_1.getInput)('file-path');
+    const rawPaths = core_1.getInput('file-path');
     const allowDot = getBooleanInput('allow-dot');
     return flatten(rawPaths.split(/\r?\n/).map((path) => {
         return expandPathPattern(path, { dot: allowDot });
@@ -254,11 +254,11 @@ function getPathsToUpdate() {
 }
 exports.getPathsToUpdate = getPathsToUpdate;
 function getActionOptions() {
-    const token = (0, core_1.getInput)('github-token', { required: true });
-    const message = (0, core_1.getInput)('commit-msg', { required: true });
-    const branch = (0, core_1.getInput)('branch');
-    const committerName = (0, core_1.getInput)('committer-name');
-    const committerEmail = (0, core_1.getInput)('committer-email');
+    const token = core_1.getInput('github-token', { required: true });
+    const message = core_1.getInput('commit-msg', { required: true });
+    const branch = core_1.getInput('branch');
+    const committerName = core_1.getInput('committer-name');
+    const committerEmail = core_1.getInput('committer-email');
     const respectGitignore = getBooleanInput('respect-gitignore');
     return {
         token,
@@ -276,8 +276,8 @@ function isNotNull(arg) {
 exports.isNotNull = isNotNull;
 function expandPathPattern(path, { dot = false }) {
     const pathPattern = path.trim();
-    if ((0, fast_glob_1.isDynamicPattern)(pathPattern)) {
-        return (0, fast_glob_1.sync)(pathPattern, { dot });
+    if (fast_glob_1.isDynamicPattern(pathPattern)) {
+        return fast_glob_1.sync(pathPattern, { dot });
     }
     return [pathPattern];
 }
@@ -19785,13 +19785,13 @@ const core_1 = __nccwpck_require__(2186);
 const util_1 = __nccwpck_require__(9731);
 const update_1 = __nccwpck_require__(5206);
 function main() {
-    const options = (0, util_1.getActionOptions)();
-    const pathsToUpdate = (0, util_1.getPathsToUpdate)();
-    const isRemovingAllowed = (0, util_1.getBooleanInput)('allow-removing');
+    const options = util_1.getActionOptions();
+    const pathsToUpdate = util_1.getPathsToUpdate();
+    const isRemovingAllowed = util_1.getBooleanInput('allow-removing');
     for (const path of pathsToUpdate) {
-        const isLocalFileExists = (0, fs_1.existsSync)(path);
+        const isLocalFileExists = fs_1.existsSync(path);
         if (!isLocalFileExists && !isRemovingAllowed) {
-            (0, core_1.setFailed)(`Removing remote ${path} is not allowed`);
+            core_1.setFailed(`Removing remote ${path} is not allowed`);
             return;
         }
     }
@@ -19800,16 +19800,16 @@ function main() {
         .updateFiles(pathsToUpdate)
         .then((updateResult) => {
         if (updateResult === null) {
-            (0, core_1.info)('No files to update');
+            core_1.info('No files to update');
             return;
         }
         const { commitSha, branch } = updateResult;
-        (0, core_1.setOutput)('commit-sha', commitSha);
+        core_1.setOutput('commit-sha', commitSha);
         const shortSha = commitSha.slice(0, 7);
-        (0, core_1.info)(`Pushed ${shortSha} to ${branch}`);
+        core_1.info(`Pushed ${shortSha} to ${branch}`);
     })
         .catch((err) => {
-        (0, core_1.setFailed)(err.message);
+        core_1.setFailed(err.message);
     });
 }
 main();
